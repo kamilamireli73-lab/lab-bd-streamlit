@@ -1,32 +1,39 @@
 import streamlit as st
-import PSYCOPG2
+import psycopg2
 
-CONN = PSYCOPG2.CONNECT(
-    HOST=ST.SECRETS["DB_HOST"],
-    DATABASE= ST.SECRETS["DB_NAME"],
-    USER=ST.SECRETS["DB_USER"],
-    PASSWORD=ST.SECRETS["DB_PASSWORD"],
-    PORT=ST.SECRETS["DB_PORT"]
+conn = psycopg2.connect(
+    host=st.secrets["DB_HOST"],
+    database=st.secrets["DB_NAME"],
+    user=st.secrets["DB_USER"],
+    password=st.secrets["DB_PASSWORD"],
+    port=st.secrets["DB_PORT"]
 )
 
-CURSOR = CONN.CURSOR()
+cursor = conn.cursor()
 
-st.title("sistema de cadastro")
-st.write("bem-vindo ao sistema!")
+st.title("Sistema de Cadastro")
 
-CURSOR.EXECUTE("SELECT NOME,EMAIL FROM CLIENTE")
-DADOS = CURSOR.FETCHALL()
-for NOME, EMAIL in DADOS:
-ST.write(F"{NOME} = {EMAIL}")
+st.write("Bem-vindo ao sistema!")
+
+cursor.execute("SELECT nome, email FROM cliente")
+
+dados = cursor.fetchall()
+
+for nome, email in dados:
+    st.write(f"{nome} = {email}")
 
 
-NOME = ST.TEXT_INPUT("NOME")
-EMAIL = ST.TEXT_INPUT("EMAIL")
+nome = st.text_input("Nome")
 
-if ST.BUTTON("CADASTRAR"):
-CURSOR.EXECUTE(
-    "INSERT INTO CLIENTE (NOME, CPF, EMAIL) VALUES (%S,%$,%$)",
-    (NOME,"000001", EMAIL)
-)
-CONN.COMMIT()
-ST.SUCCEESS("CADASTRADO COM SUCESSO!")
+email = st.text_input("Email")
+
+if st.button("Cadastrar"):
+
+    cursor.execute(
+        "INSERT INTO cliente (nome, cpf, email) VALUES (%s, %s, %s)",
+        (nome, "000001", email)
+    )
+
+    conn.commit()
+
+    st.success("Cadastrado com sucesso!")
